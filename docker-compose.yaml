@@ -1,0 +1,9 @@
+version: '3.7'
+services:
+  netbilling:
+    build:
+      context: .
+    image: registry.its-k8s-dev.swatchgroup.net/common/launchmp:latest
+    command:  ["python","main.py"]
+    #command:  ["tail","-f",  "/dev/null"]
+

@@ -1,0 +1,51 @@
+{{- if and (.Values.ingress.enabled) (.Values.ingress.route) -}}
+{{- $fullName := include "launchmp-helm.fullname" . -}}
+{{- $svcPort := .Values.service.port -}}
+{{- $enablemiddlewares :=  .Values.ingress.enablemiddlewares }}
+
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: {{ $fullName }}
+  {{- with .Values.ingress.annotations }}
+  annotations:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  entryPoints:
+    - websecure
+    - web
+  routes:
+    {{- range .Values.ingress.hosts }}
+    - kind: Rule
+      match: Host(`{{- .host }}`)
+      priority: 10
+      {{- if $enablemiddlewares }}
+      middlewares:
+        {{- range .middlewares }}
+        - name: {{ .name -}}
+      {{- end }}
+      {{- end }}
+      services:
+        - kind: Service
+          name: {{ $fullName }}
+          passHostHeader: true
+          port: {{ $svcPort }}
+          #responseForwarding:
+          #  flushInterval: 1ms
+          scheme: https
+          #sticky:
+          #  cookie:
+          #    httpOnly: true
+          #    name: cookie
+          #    secure: true
+          #    sameSite: none
+          #strategy: RoundRobin
+          #weight: 10
+  {{- end }}
+
+  {{- range .Values.ingress.tls }}
+  tls:
+    secretName:  {{ .secretName }}
+  {{- end }}
+  {{- end }}

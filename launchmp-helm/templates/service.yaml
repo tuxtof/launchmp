@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name:  {{ template "launchmp-helm.fullname" . }}
+  annotations: {}
+#    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "arn:aws:acm:us-west-2:XXXXXXXX:certificate/XXXXXX-XXXXXXX-XXXXXXX-XXXXXXXX"
+#    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "http"
+#    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "443"
+#    service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "60"
+spec:
+  ports:
+  - name: http
+    port: 5000
+    targetPort: 5000
+#  - name: https
+#    port: 443
+#    targetPort: 8080
+  selector:
+    {{- include "launchmp-helm.selectorLabels" . | nindent 4 }}
+  type: {{.Values.service.type}}
+  # this is for HA use-cases
+#  sessionAffinity: ClientIP
