@@ -9,7 +9,7 @@ import re
 import os
 
 auth = HTTPBasicAuth(os.environ.get('PC_USERNAME'),os.environ.get('PC_PASSWORD'))
-PC_IP = "its-prism-central-lab.swatchgroup.net"
+PC_IP = "spe-pc.nxlab.fr"
 
 
 def get_request(url, params):
@@ -119,8 +119,11 @@ def deploy_app(bp_spec, bp_uuid, appname, timeout=1200):
     payload['spec']['application_name'] = appname
     payload['spec']['app_profile_reference'] = {'kind': 'app_profile', 'uuid':payload['spec']['resources']['app_profile_list'][0]['uuid']}
 
-    #if a profile value has to be modified
-    #payload['spec']['resources']['app_profile_list'][0]['variable_list'][0]['value']="value"
+    #profile value to be modified here
+    payload['spec']['resources']['app_profile_list'][0]['variable_list'][0]['value']="new_value_option1"
+    payload['spec']['resources']['app_profile_list'][0]['variable_list'][1]['value']="new_value_option2"
+    
+
     #Post to calm api
     url1 = "https://" + PC_IP + ":9440/api/nutanix/v3/blueprints/"+bp_uuid+"/launch"
     headers = {'Content-type': 'application/json','Accept': 'application/json'}
